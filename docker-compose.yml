@@ -1,0 +1,61 @@
+version: '3'
+
+services:
+  mysql:
+    container_name: sistema-distribuido-mysql
+    image: mysql:5
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=root
+
+  server-1:
+    container_name: sistema-distribuido-server-1
+    image: node:14
+    working_dir: /usr/app/
+    command: bash -c "npm install && npm run start"
+    volumes:
+      - ./server1:/usr/app/
+      - ./server1/node_modules:/usr/app/node_modules
+    ports:
+      - '3001:3001'
+    environment:
+      DATABASE_URL: host.docker.internal
+      DATABASE_PORT: 3306
+
+  server-2:
+    container_name: sistema-distribuido-server-2
+    image: node:14
+    working_dir: /usr/app/
+    command: bash -c "npm install && npm run start"
+    volumes:
+      - ./server2:/usr/app/
+      - ./server2/node_modules:/usr/app/node_modules
+    ports:
+      - '3002:3002'
+    environment:
+      DATABASE_URL: host.docker.internal
+      DATABASE_PORT: 3306
+
+  server-3:
+    container_name: sistema-distribuido-server-3
+    image: node:14
+    working_dir: /usr/app/
+    command: bash -c "npm install && npm run start"
+    volumes:
+      - ./server3:/usr/app/
+      - ./server3/node_modules:/usr/app/node_modules
+    ports:
+      - '3003:3003'
+    environment:
+      DATABASE_URL: host.docker.internal
+      DATABASE_PORT: 3306
+
+  nginx:
+    container_name: sistema-distribuido-nginx
+    image: nginx
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - '3000:3000'
